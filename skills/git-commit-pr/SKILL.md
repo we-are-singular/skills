@@ -220,6 +220,34 @@ If `pre-push` runs expensive checks (e.g., lint + test + build), mention that be
 
 Its usually best to fix the real issue and retry the same commit, rather than bypassing the hook or creating a new commit that hides the issue. This keeps history clean and avoids pushing broken commits.
 
+### If lint-staged or formatter hooks changed files:
+
+Some repos run `lint-staged`, `pretty-quick`, Prettier, ESLint/Biome fixes, or similar staged-file formatters in `pre-commit`. These hooks may modify files and then reject the commit until the modified files are staged again.
+
+When that happens:
+
+1. Read the hook output to identify the command that ran.
+2. Inspect the resulting changes with `git diff` and `git diff --cached`.
+3. Make sure the formatter did not touch unrelated files.
+4. Restage only the intended formatted files.
+5. Retry the original commit.
+
+```bash
+git diff -- path/to/file.ts
+git add path/to/file.ts
+git commit -m "feature(frontend): add saved view filters"
+```
+
+If the repo exposes a staged-file fix command, prefer that over calling tools directly:
+
+```bash
+npm run lint-staged
+npx lint-staged
+npx pretty-quick --staged
+```
+
+Use the command named by the repo's scripts or hook output. Do not assume every repo uses the same staged-file tool.
+
 ### If push fails because a hook rejected the branch:
 
 1. Read the hook logs. It is usually a lint, typecheck, test, formatting, or commit message error.
