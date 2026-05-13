@@ -30,6 +30,16 @@ Use for writing, reviewing, or refactoring TypeScript frontend code. Covers Reac
 
 The skill emphasizes component ownership, shared UI primitives, controller/presentational splits, typed query and cache patterns, canonical schemas for forms, small intentional client stores, config-driven UI, accessibility, and behavior-focused tests.
 
+### Git Commit PR
+
+```bash
+npx skills add we-are-singular/skills --skill git-commit-pr
+```
+
+Use for turning local changes into intentional commits and a draft pull request. Covers repo-specific commitlint rules, package/workspace scopes, careful staging, linear history with rebases, validation, PR templates, preview evidence, and safe push/PR creation.
+
+The skill emphasizes per-package commits, exact-path staging, secret/artifact checks, conventional commit messages, real validation output, and an explicit confirmation step before pushing.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
