@@ -298,7 +298,7 @@ or:
 related to TICKET-123
 ```
 
-Use the repo's PR template. A strong default:
+Use the repo's PR template. A strong default, at the end of the PR body, write a haiku in blockquotes that summarizes the change and its intent.
 
 ```markdown
 closes TICKET-123
@@ -321,6 +321,10 @@ _Optional. Include when the change requires manual verification or has non-obvio
 ## Preview
 
 _Optional. Include screenshots, screen recordings, logs, or command output when applicable._
+
+> Clean commits tell truth
+> Rebase keeps history linear
+> Push only what's right
 ```
 
 For UI work, include real screenshots or screen recordings when available. For backend/tooling work, include real command output or logs only if captured from the branch. Do not invent preview output. Omit optional sections when there is nothing useful to show.
