@@ -8,6 +8,16 @@ These skills capture engineering patterns we use for TypeScript application work
 
 These skills are highly opinionated and reflect Singular's internal patterns and preferences. They are not a global best-practices guide. Anyone is welcome to use or follow them, but they intentionally encode our taste rather than universal rules.
 
+## AGENTS
+
+### Generic Code Agent
+
+Install the generic `AGENTS.md` into your home agent config on Linux or macOS:
+
+```bash
+mkdir -p "$HOME/.agents" && curl -fsSL "https://raw.githubusercontent.com/we-are-singular/skills/main/AGENTS.md" -o "$HOME/.agents/AGENTS.md"
+```
+
 ## Skills
 
 ### Backend Architecture
