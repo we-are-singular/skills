@@ -28,6 +28,7 @@ Default posture: keep UI ergonomic, keep data ownership explicit, and keep share
 - Keep components small and focused. Extract when a component has multiple responsibilities, grows past roughly 100 lines, or a pattern appears in two places.
 - Prefer composition over prop drilling or prop-heavy APIs. Use `children`, slots, render props, or compound components for renderable regions and actions.
 - Avoid drilling props more than one level through components that do not use them. Lift composition to the caller or introduce a focused provider/store.
+- Let components read or derive app data, paths, locale, auth/session, and other app context from established providers or framework locals when appropriate instead of threading every value through intermediate components. Props are for the immediate boundary and final presentational components.
 - Name things by UI or domain responsibility: `ResourceTable`, `UserMenu`, `createResourceQueryOptions`, `resourceService`, `$activePanel`.
 - Avoid vague names like `Manager`, `Helper`, `Util`, or `Wrapper` unless the file is genuinely just framework glue.
 - Prefer clear names over abbreviations. Keep functions pure when practical and keep transformation logic separate from rendering and effects.
@@ -35,6 +36,9 @@ Default posture: keep UI ergonomic, keep data ownership explicit, and keep share
 - Split controller code from presentational primitives. The controller can know about routes, queries, analytics, and feature-specific callbacks; the primitive should receive data and callbacks.
 - For complex interactions, prefer a headless hook plus a small primitive tree over a large component that mixes DOM, state machine, and data fetching.
 - Keep generated files clearly marked and avoid hand-editing them unless the repo explicitly expects it.
+- Keep abstractions local until reuse is real. Do not add helper files, barrels, or single-purpose indirection unless they clarify ownership or support a real package boundary.
+- Avoid "spaghetti DRY": centralization is good only when it simplifies call sites and ownership.
+- Do not invent future state. If a future field or behavior is not implemented yet, leave a clear TODO instead of speculative logic.
 - Follow repo-local formatting, linting, import ordering, accessibility, and file naming over personal preference.
 
 ## App Boundaries
@@ -53,6 +57,7 @@ Pages and route files should own routing concerns:
 Keep substantial interaction logic, cache updates, forms, and rendering branches out of route files when possible. Move them into feature components, services, or hooks with clear ownership.
 
 For Astro-style apps, use Astro for document structure, metadata, static content, and top-level layout composition. Use React islands for stateful or interactive parts. Pass small, serializable props from Astro to React; do not dump large server objects into islands.
+Astro pages can use `Astro.locals` for request context such as locale, i18n, auth/session, and app-owned path builders. React islands are acceptable for forms and interactive flows; keep server workflows in Astro Actions, route handlers, or controllers instead of creating public APIs solely for internal submissions.
 
 For Next-style apps, keep server-only code in server components, loaders, route handlers, or actions. Keep client components focused on interaction and browser state. Do not let client components import server-only modules by accident.
 
@@ -86,7 +91,7 @@ export function ResourcePickerController(): React.JSX.Element {
   return (
     <ResourcePicker
       resources={data}
-      onCreate={name => create.mutateAsync({ name })}
+      onCreate={(name) => create.mutateAsync({ name })}
       renderEmpty={() => <EmptyState title="No resources yet" />}
     />
   )
@@ -229,12 +234,12 @@ Optimistic mutation shape:
 
 ```tsx
 const renameMutation = useMutation<Resource, Error, string, { previous?: ResourceList }>({
-  mutationFn: name => updateResourceName({ id, name }),
-  onMutate: async name => {
+  mutationFn: (name) => updateResourceName({ id, name }),
+  onMutate: async (name) => {
     await queryClient.cancelQueries({ queryKey: resourceListQueryKey })
     const previous = queryClient.getQueryData<ResourceList>(resourceListQueryKey)
-    queryClient.setQueryData<ResourceList>(resourceListQueryKey, current =>
-      current ? current.map(item => (item.id === id ? { ...item, name } : item)) : current
+    queryClient.setQueryData<ResourceList>(resourceListQueryKey, (current) =>
+      current ? current.map((item) => (item.id === id ? { ...item, name } : item)) : current,
     )
     return { previous }
   },
@@ -242,7 +247,7 @@ const renameMutation = useMutation<Resource, Error, string, { previous?: Resourc
     if (context?.previous) queryClient.setQueryData(resourceListQueryKey, context.previous)
     toast.error(error.message)
   },
-  onSuccess: resource => {
+  onSuccess: (resource) => {
     queryClient.setQueryData(resourceDetailQueryKey(resource.id), resource)
     track("resource:update_name")
   },
@@ -290,7 +295,7 @@ const saveConfig = debounce((config: EditorConfig) => {
   void actions.resourceConfig.update({ config }).then(() => previewStore.invalidate())
 }, 100)
 
-$editor.listen(state => {
+$editor.listen((state) => {
   if (typeof window === "undefined") return
   if (!state.dirty) return
   saveConfig(state.config)
@@ -321,6 +326,9 @@ Form guidance:
 - Disable submit while pending and show minimal loading feedback for important actions.
 - Surface field errors near fields in the shape expected by the shared field components.
 - For server actions or form posts, use a reusable action handler when the app repeats the same state, cleanup, field-error, general-error, and success-notification flow.
+- For server-action stacks, keep server workflows in actions/controllers rather than inventing public API routes only for an internal form.
+- In Astro-style apps, React islands are acceptable for forms. Submit through Astro Actions when the surrounding app already uses them.
+- In Astro Actions, prefer one umbrella `try`/`catch` when the catch behavior is the same. Preserve explicit action errors, and convert unexpected errors through the app's shared `getErrorMessage`-style utility.
 - For file inputs and drop zones, validate the file metadata through a schema at the component boundary and expose `onBeforeValidation`, `onValidationError`, and `onFileSelect` callbacks.
 - Keep form controls accessible even when custom-styled: labels, `aria-describedby`, `aria-invalid`, keyboard activation, hidden native inputs, and live regions when status changes matter.
 
@@ -345,19 +353,19 @@ export function ResourceForm({
 
   return (
     <form
-      onSubmit={event => {
+      onSubmit={(event) => {
         event.preventDefault()
         void form.handleSubmit()
       }}
     >
       <form.Field name="name" validators={{ onBlur: optionalNameSchema, onSubmit: optionalNameSchema }}>
-        {field => (
+        {(field) => (
           <input
             id={field.name}
             name={field.name}
             value={field.state.value}
             onBlur={field.handleBlur}
-            onChange={event => field.handleChange(event.target.value)}
+            onChange={(event) => field.handleChange(event.target.value)}
             aria-invalid={field.state.meta.errors.length > 0}
           />
         )}
@@ -447,6 +455,8 @@ Use the repo's naming first. When ambiguous, prefer:
 - Feature folders own feature-specific components, hooks, stores, and tests.
 - Shared UI packages own generic primitives and composed interaction patterns.
 - Avoid barrel files unless the repo already relies on them. Direct imports make ownership clearer.
+- Shared reusable primitives belong in shared packages only when multiple apps, packages, or features can realistically reuse them.
+- Do not create helper files just for one tiny function. Keep tiny local logic inline until extraction makes the caller clearer or prevents real duplication.
 
 Common frontend shapes include `components/feature-name`, `components/common`, `services/domain`, `stores`, `hooks`, `layouts`, `pages`, `routes`, `utils`, and `integrations`. The point is ownership, not exact folder names.
 
@@ -455,6 +465,7 @@ Common frontend shapes include `components/feature-name`, `components/common`, `
 Prefer behavior-focused tests. Do not write tests for what the type system already guarantees.
 
 Use the repo's stack, usually Vitest, Testing Library, Playwright, and local render helpers.
+Use real provider setup for context-heavy concerns such as i18n, routing, query clients, and auth/session. For i18n specifically, prefer the real setup or the default locale instead of reimplementing translation behavior in tests.
 
 Test:
 

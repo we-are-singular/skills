@@ -24,10 +24,14 @@ Default posture: boundaries early, implementations lean.
 
 - Use TypeScript for backend code. Prefer strict, explicit domain models over loose objects.
 - Keep implementations direct, but create clear ownership boundaries before code becomes tangled.
+- Keep things simple and local until reuse is real.
 - Name things by domain responsibility: `MailboxRepository`, `ProvisioningService`, `createRepository`, `WebhookCryptoService`.
 - Avoid vague names like `Manager`, `Handler`, `Processor`, or `Util` unless the framework or domain role is genuinely vague.
 - Use ESM and `node:` imports for Node builtins when the repo supports them.
 - Keep generated files clearly marked and avoid hand-editing them unless the repo explicitly expects it.
+- Avoid unnecessary helper files, barrels, and single-purpose indirection unless they clarify ownership or support a real package boundary.
+- Avoid "spaghetti DRY": centralization is good only when it simplifies call sites and ownership.
+- Do not invent future state. If a future field or behavior is not implemented yet, leave a clear TODO instead of speculative logic.
 - Keep server-only packages out of browser bundles; add an explicit runtime guard if accidental browser import would be dangerous.
 - Follow repo-local formatting, linting, and import ordering over personal preference.
 
@@ -413,6 +417,7 @@ Before adding a helper:
 - Add focused tests when parsing, normalization, security, crypto, dates, IDs, or edge cases are involved.
 
 Do not create one file for every tiny function. Keep tiny single-use logic inline until extraction makes the caller clearer or prevents duplication.
+Do not add helper functions just to DRY one line. Centralize only when the helper names a real concept, clarifies ownership, or removes meaningful duplication.
 
 ## Environment And Config
 
@@ -463,6 +468,7 @@ Use JSDoc for:
 
 Use inline comments sparingly for:
 
+- Tricky parsing, fake URLs, auth/session behavior, provider wiring, fallbacks, temporary workarounds, and intentional hacks.
 - Why the order matters.
 - Why an operation is intentionally non-blocking.
 - Why a fallback is safe.
@@ -509,6 +515,7 @@ Throw for:
 Do not bury expected business outcomes in generic exceptions when a typed return is clearer.
 
 Use tolerant parsing only for intentionally partial, best-effort list surfaces where dropping invalid items is a product decision and the failure is logged with enough context. For canonical database reads, admin views, security-sensitive data, and durable contracts, fail loudly instead of hiding malformed data.
+At transport, action, or controller boundaries, use a shared `getErrorMessage`-style utility for converting unknown errors into user-facing messages. Preserve explicit framework/domain errors rather than wrapping them into generic messages.
 
 ## Logging And Observability
 
@@ -530,6 +537,7 @@ Use test-assisted development by default:
 
 - Add or update tests as part of backend changes.
 - Go test-first for bugs, regressions, risky branching, contracts, security, crypto, auth/guards, and persistence transitions.
+- For exploratory work where the implementation shape is still moving, avoid freezing tests around churn. Once the shape settles, add or update behavior tests for the final branches, contracts, and failure modes.
 - Do not test what TypeScript already guarantees.
 - Keep tests focused on behavior and contracts, not implementation trivia.
 
