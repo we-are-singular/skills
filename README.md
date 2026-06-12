@@ -20,6 +20,16 @@ mkdir -p "$HOME/.agents" && curl -fsSL "https://raw.githubusercontent.com/we-are
 
 ## Skills
 
+### Singular Code Review
+
+```bash
+npx skills add we-are-singular/skills --skill singular-code-review
+```
+
+Use for reviewing code changes, pull requests, branches, or work-in-progress diffs. Covers intent discovery from conversation history, PR bodies, plans and issues; git-heavy diff scoping; surrounding-code pattern checks; backend/frontend architecture fit; correctness and test risk; naming; over-engineering; and maintainability refactor paths.
+
+The skill emphasizes subagent-oriented review lanes, local `AGENTS.md` and documentation, evidence-backed findings, and a high bar for pattern drift, hidden scope, unclear intent, and code that makes the surrounding architecture worse.
+
 ### Backend Architecture
 
 ```bash
