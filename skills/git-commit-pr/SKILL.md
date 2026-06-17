@@ -298,36 +298,45 @@ or:
 related to TICKET-123
 ```
 
-Use the repo's PR template. A strong default, at the end of the PR body, write a haiku in blockquotes that summarizes the change and its intent.
+Use the repo's PR template. A strong default, at the end of the PR body, write an original haiku in blockquotes that summarizes the specific change and intent of this PR.
 
 ```markdown
 closes TICKET-123
 
 ## Description
 
-Adds webhook delivery management across persistence, API workflows, and the frontend management screen.
+<!--- Template hint only. Replace comments with final prose before publishing. What changed? Why does it matter? -->
 
 ## What changed?
 
-- Added webhook delivery persistence and repository helpers in `packages/db`.
-- Added API routes and service wiring for listing, retrying, and inspecting deliveries.
-- Added frontend query hooks and management UI for delivery logs.
-- Added focused tests around retry eligibility and filter behavior.
+<!--- Template hint only. Replace comments with final prose before publishing. Bullet list or brief summary of the main code changes, UI, API, workflow changes, and blast radius. -->
 
-## How to test
+<!--- Template hint only. Remove this comment before publishing. Optional `## Why`: add before Verification only when the reason is not obvious from the code, using context from this chat, docs, plans, issues, commits, or the diff. -->
 
-_Optional. Include when the change requires manual verification or has non-obvious test steps._
+## Verification
 
-## Preview
-
-_Optional. Include screenshots, screen recordings, logs, or command output when applicable._
+<!--- Template hint only. Replace comments with final prose before publishing. Brief sentence bullets only. Capture the reviewable verification effort and manual-test path, not intrinsic CI hygiene like npm test/lint/build commands. Include where to see or feel the change locally when useful. -->
 
 > Clean commits tell truth
 > Rebase keeps history linear
 > Push only what's right
 ```
 
-For UI work, include real screenshots or screen recordings when available. For backend/tooling work, include real command output or logs only if captured from the branch. Do not invent preview output. Omit optional sections when there is nothing useful to show.
+Keep the PR body slim:
+
+Before showing or publishing the final PR body, remove every template hint and HTML comment. The final body should contain only reviewer-facing prose, bullets, links, images/logs when useful, and the PR-specific haiku.
+
+- `## Why` is optional. Include it only when the branch carries decision context that a reviewer cannot recover from code alone. Source it from the current chat, repo docs, plans, issues, commit messages, or the diff itself. Do not use it to restate what changed.
+- `## Verification` should be a short bullet list of sentences describing the verification effort that makes the change reviewable: exercised flows, scenarios checked, evidence inspected, and how or where a reviewer can manually see the feature.
+- Do not list intrinsic hygiene commands such as npm test, npm lint, npm build, turbo checks, or pre-push hooks in the PR body. Those are assumed to have been run and belong in the confirmation/handoff notes when useful, not in `## Verification`.
+- Each verification bullet should be concrete and brief, for example:
+  - Clicked Buy, then confirmed the order appears in wallet history.
+  - Used the browser to assert the new badge and spacing match design.
+  - Asserted the order id is present in the API response.
+  - Checked the export file size stays under the limit.
+  - Visit `/wallet/movements` locally and deposit test funds to see the new movement row.
+
+For UI work, include real screenshots or screen recordings when available. For backend/tooling work, include real command output or logs only if captured from the branch and useful to reviewers. Do not invent preview output. Omit optional sections when there is nothing useful to show.
 
 ## Confirm Before Push
 
