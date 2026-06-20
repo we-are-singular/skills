@@ -46,11 +46,28 @@ These are durable coding-assistant defaults. Repo-level `AGENTS.md`, local docs,
 - Avoid single-purpose files that only exist to hold one tiny helper unless there is a strong boundary reason.
 - Do not introduce barrels or re-export layers unless the package already uses them intentionally or the API surface benefits from it.
 - Do not invent future state. If a future field or behavior is not implemented yet, leave a clear TODO instead of speculative logic.
-- Use comments and docblocks as part of the architecture, not as filler.
 - Add docblocks to exported classes/functions that define an abstraction boundary or non-obvious contract.
-- Comment tricky parsing, fake URLs, auth/session behavior, provider wiring, fallbacks, and intentional hacks.
 - If code uses a temporary base URL, workaround, defensive branch, or framework quirk, explain why directly above it.
 - Preserve intentional TODOs and commented sketches when they document a future implementation seam.
+
+## Comment Style
+
+  - Before editing a file, look at its existing comment density and style. Match that pattern.
+  - Comments should explain why a branch, query shape, fallback, ordering step, or boundary exists.
+  - Prefer short, incisive comments directly above the non-obvious line/block.
+  - Do not narrate obvious code. Avoid comments like “map rows” or “return result”.
+  - Add docblocks to exported methods/classes and private methods that encode a non-obvious contract.
+  - Add inline comments before:
+    - query forks or multi-step DB reads
+    - order restoration after unordered reads
+    - provider/framework quirks
+    - temporary compromises
+    - defensive behavior that is not obvious from the type signature
+    - long running code blocks and encapsulations
+    - long forking logic with multiple decision paths
+  - When code has a complex branch with no comment, treat that as incomplete.
+  - Keep comments factual and local: one or two lines, no essays, no vague future speculation.
+
 
 ## Planning And Tracking
 
@@ -87,6 +104,3 @@ These are durable coding-assistant defaults. Repo-level `AGENTS.md`, local docs,
 - When a ticket relationship exists, start the PR body with it, such as `closes TICKET-123` or `related to TICKET-123`.
 - Draft PRs are acceptable for stacked work. Mention follow-up PR relationships when relevant.
 
-## Plannotator
-
-- For gated Plannotator annotations, start the command, confirm it is waiting for the gate, then use one long wait. Do not repeatedly poll with short waits and status updates while the user may be away.
