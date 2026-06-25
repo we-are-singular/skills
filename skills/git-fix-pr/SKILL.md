@@ -1,6 +1,6 @@
 ---
 name: git-fix-pr
-description: Use when an existing pull request has CI failures, unresolved review comments, PR-body TODOs, or merge blockers that need a deliberate fix pass. Covers blocker triage, user-approved fixes or pushback, local commits, reviewer replies or PR text updates, and one final push at the end.
+description: Use when an active PR needs a deliberate fix pass to identify the right PR, triage CI, review, and body blockers, agree on actions with the user, make and commit the fixes, update reviewer threads or PR text, then push once.
 ---
 
 # Git Fix PR
@@ -156,11 +156,11 @@ A plan is accepted only when every blocking item has its own recorded decision. 
 After the user approves the plan, execute in this order.
 
 1. **Implement local changes.** Keep edits scoped to the approved items. Preserve user changes and unrelated local work. If a new blocker appears, stop and amend the plan with the user.
-2. **Validate.** Run the local equivalent of failed CI first, then package or repo checks justified by the blast radius. Capture the commands and outcomes for the final handoff and reviewer replies when useful.
+2. **Validate.** Run the local equivalent of failed CI first, then package or repo checks justified by the blast radius. Capture the commands and outcomes for the final handoff.
 3. **Commit locally.** Follow `git-commit-pr` conventions: exact-path staging, focused commits, repo commitlint rules, and no broad `git add .`. Capture final short SHAs.
 4. **Rebase before posting SHA-bearing replies.** If a rebase or conflict fix is required, do it before publishing replies that mention commit IDs. If a rebase rewrites SHAs after replies were drafted, update the drafts.
 5. **Post or queue replies before the final push.** For each review or PR comment that caused an action, post the reply before pushing when the forge allows it. If the reply must wait for remote commits, draft the exact reply text now and treat it as queued work that must happen immediately after the final push:
-   - Fixed: `Fixed in <sha>: <one-line summary>. Validation: <specific check or manual evidence>.`
+   - Fixed: `Fixed in <sha>: <one-line summary>.`
    - Pushback: `Leaving this unchanged: <reason>. <evidence or tradeoff>.`
    - Deferred by user choice: `Leaving this open for now per plan: <reason/owner>.`
 6. **Update PR body or top-level thread when needed.** If the approved work changed direction, added meaningful scope, closed TODOs, or made the body contradictory, edit the PR body. For major direction changes or new features, add one main-thread comment summarizing what changed and why.
@@ -172,6 +172,7 @@ If the platform cannot accept replies before the final push because the new comm
 
 - Reply only to comments that triggered action, disagreement, or a user-approved deferral. Avoid noisy blanket updates.
 - Keep replies factual and compact. Mention the commit id for code changes, not an essay.
+- Do not include validation summaries, command lists, or `Validation:` sentences in review or PR comment replies. If the fix is test coverage, say the test was added, not which commands passed.
 - When pushing back, explain the technical reason or product tradeoff. Do not frame it as preference.
 - Do not mark a thread resolved unless the issue is actually fixed, intentionally rejected, or explicitly deferred with the user's approval.
 - Remove stale TODOs or template hints from the PR body only after the underlying task is done or confirmed obsolete.
