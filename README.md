@@ -60,6 +60,16 @@ Use for turning local changes into intentional commits and a draft pull request.
 
 The skill emphasizes per-package commits, exact-path staging, secret/artifact checks, conventional commit messages, real validation output, and an explicit confirmation step before pushing.
 
+### Git Fix PR
+
+```bash
+npx skills add we-are-singular/skills --skill git-fix-pr
+```
+
+Use for bringing an existing pull request back to a mergeable or review-ready state. Covers PR state inspection, failing CI, unresolved review comments, TODOs in the PR body, per-blocker planning with the user, local fixes, short reviewer replies, PR body updates, and one final push after everything is ready.
+
+The skill emphasizes full blocker triage before editing, explicit user choices for fix versus pushback versus deferral, reviewer replies or queued reply text before the final push, and avoiding repeated review triggers from incremental pushes.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
