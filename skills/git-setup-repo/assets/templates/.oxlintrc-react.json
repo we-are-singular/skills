@@ -1,0 +1,119 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "oxc", "import", "unicorn", "react"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "style": "warn",
+    "pedantic": "off"
+  },
+  "env": {
+    "es2024": true
+  },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/.cache/**",
+    "**/.output/**",
+    "**/build/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/*.gen.*",
+    "**/generated/**"
+  ],
+  "rules": {
+    "eslint/no-unused-vars": "error",
+    "typescript/no-unused-vars": "error",
+    "eslint/no-undef": "error",
+    "eslint/no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
+    "import/first": "off",
+    "import/group-exports": "off",
+    "import/no-duplicates": "off",
+    "import/consistent-type-specifier-style": "off",
+    "import/no-nodejs-modules": "off",
+    "import/no-named-export": "off",
+    "import/no-anonymous-default-export": "off",
+    "import/prefer-default-export": "off",
+    "import/exports-last": "off",
+    "import/no-unassigned-import": ["error", { "allow": ["**/*.css", "**/*.scss"] }],
+    "eslint/no-var": "error",
+    "eslint/prefer-const": "error",
+    "eslint/curly": "off",
+    "eslint/no-nested-ternary": "off",
+    "eslint/id-length": "off",
+    "eslint/sort-imports": "off",
+    "eslint/sort-keys": "off",
+    "typescript/array-type": "off",
+    "typescript/consistent-type-imports": "error",
+    "typescript/consistent-type-exports": "error",
+    "typescript/consistent-type-definitions": "off",
+    "eslint/prefer-template": "error",
+    "eslint/eqeqeq": "error",
+    "eslint/no-debugger": "error",
+    "eslint/no-async-promise-executor": "error",
+    "eslint/no-alert": "error",
+    "eslint/no-empty": "error",
+    "eslint/no-console": ["warn", { "allow": ["warn", "error", "info"] }],
+    "typescript/no-explicit-any": "warn",
+    "typescript/no-non-null-assertion": "warn",
+    "typescript/no-extraneous-class": "off",
+    "typescript/no-unnecessary-type-constraint": "error",
+    "unicorn/filename-case": ["error", { "cases": { "kebabCase": true } }],
+    "react/jsx-no-undef": "error",
+    "react/rules-of-hooks": "error",
+    "react/react-in-jsx-scope": "off",
+    "oxc/no-barrel-file": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["src/**/*.{js,jsx,ts,tsx}", "client/src/**/*.{js,jsx,ts,tsx}"],
+      "env": {
+        "browser": true
+      }
+    },
+    {
+      "files": [
+        "server/**/*.{js,mjs,cjs,ts,mts,cts}",
+        "script/**/*.{js,mjs,cjs,ts,mts,cts}",
+        "config/**/*.{js,mjs,cjs,ts,mts,cts}",
+        "*.config.{js,mjs,cjs,ts,mts,cts}"
+      ],
+      "env": {
+        "node": true
+      }
+    },
+    {
+      "files": [
+        "**/*.{test,spec}.{js,jsx,mjs,cjs,ts,tsx,mts,cts}",
+        "**/tests/**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}"
+      ],
+      "plugins": ["vitest"],
+      "globals": {
+        "beforeEach": "readonly",
+        "afterEach": "readonly",
+        "beforeAll": "readonly",
+        "afterAll": "readonly",
+        "aroundEach": "readonly",
+        "aroundAll": "readonly",
+        "describe": "readonly",
+        "suite": "readonly",
+        "it": "readonly",
+        "test": "readonly",
+        "expect": "readonly",
+        "assert": "readonly",
+        "chai": "readonly",
+        "expectTypeOf": "readonly",
+        "assertType": "readonly",
+        "onTestFailed": "readonly",
+        "onTestFinished": "readonly",
+        "vi": "readonly",
+        "vitest": "readonly"
+      },
+      "rules": {
+        "typescript/no-explicit-any": "off",
+        "typescript/no-non-null-assertion": "off",
+        "unicorn/filename-case": "off",
+        "vitest/prefer-importing-vitest-globals": "off"
+      }
+    }
+  ]
+}

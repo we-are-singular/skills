@@ -81,15 +81,15 @@ Prefer several focused commits over one large feature commit. Group by package/w
 Bad:
 
 ```text
-feature(frontend): feature a
+feat(frontend): feature a
 ```
 
 Better:
 
 ```text
-feature(db): add webhook delivery tables
-feature(api): add webhook delivery routes
-feature(frontend): add webhook management screens
+feat(db): add webhook delivery tables
+feat(api): add webhook delivery routes
+feat(frontend): add webhook management screens
 test(frontend): cover webhook filters
 ```
 
@@ -106,17 +106,19 @@ type(scope): subject
 Common types:
 
 ```text
-build ci tools docs feature fix perf refactor design style test release
+build ci tools docs feat feature fix perf refactor design style test release
 ```
 
-Use `feature`, not `feat`. Use `tools` or `build`, not `chore`, unless the repo explicitly allows `chore`.
+Prefer conventional `feat` for new features. Accept `feature` as a fallback/alias when the repository allows it. Use `tools` or `build`, not `chore`, unless the repo explicitly allows `chore`.
+
+If changelog or semantic-version tooling reads commit types, verify that an allowed `feature` alias maps to the same release behavior as `feat`. Keep generated examples on `feat` unless that mapping is proven.
 
 Scope should identify the package, workspace, app, or root area changed. Derive valid scopes from the repo's workspace package names (e.g., `package.json` workspaces, `pnpm-workspace.yaml`, `.code-workspace`), `commitlint.config.*`, or `git log`. When unsure, the commit hook will reject invalid scopes and report which are allowed.
 
 Some types do not require a scope: `build`, `ci`, `docs`, `tools`, `style`. These are often cross-cutting and a scope is optional. For all other types, scope is required. Use `root` when changes are truly cross-cutting and no single package applies.
 
 ```text
-feature(api): add request audit events
+feat(api): add request audit events
 fix(ui): align dropdown keyboard behavior
 refactor(db): simplify mailbox repository filters
 test(packages/db): cover publication transitions
@@ -131,14 +133,14 @@ Some repos use short scopes like `db`, `ui`, `api`, `frontend`. Stricter repos m
 Subjects should be lowercase imperative, concise, and have no trailing period:
 
 ```text
-feature(frontend): add saved view filters
+feat(frontend): add saved view filters
 fix(api): reject missing webhook signatures
 ```
 
 Ticket prefixes are acceptable when the repo allows them:
 
 ```text
-feature(frontend): TICKET-123 add saved view filters
+feat(frontend): TICKET-123 add saved view filters
 fix(packages/db): ISSUE-456 preserve queue ordering
 ```
 
@@ -174,7 +176,7 @@ git diff --cached
 4. Commit that group.
 
 ```bash
-git commit -m "feature(db): add webhook delivery persistence"
+git commit -m "feat(db): add webhook delivery persistence"
 ```
 
 5. Repeat for each group.
@@ -235,7 +237,7 @@ When that happens:
 ```bash
 git diff -- path/to/file.ts
 git add path/to/file.ts
-git commit -m "feature(frontend): add saved view filters"
+git commit -m "feat(frontend): add saved view filters"
 ```
 
 If the repo exposes a staged-file fix command, prefer that over calling tools directly:
@@ -369,7 +371,7 @@ git push -u origin HEAD
 Create a draft PR with the GitHub CLI when available:
 
 ```bash
-gh pr create --draft --base main --head "$(git branch --show-current)" --title "feature(api): add webhook delivery management" --body-file /tmp/pr-body.md
+gh pr create --draft --base main --head "$(git branch --show-current)" --title "feat(api): add webhook delivery management" --body-file /tmp/pr-body.md
 ```
 
 If `gh` is unavailable, still push the branch, then print the PR title, PR body, and any PR creation URL emitted by `git push` so the user can create it manually.

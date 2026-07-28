@@ -1,0 +1,90 @@
+{
+  "folders": [
+    {
+      "name": "✨ Root",
+      "path": ".",
+    },
+    {
+      "name": "🚀 __APP_SCOPE__",
+      "path": "__APP_PATH__",
+    },
+    {
+      "name": "📦 __PACKAGE_SCOPE__",
+      "path": "__PACKAGE_PATH__",
+    },
+    {
+      "name": "⚙️ Config",
+      "path": "config",
+    },
+    {
+      "name": "📚 Docs",
+      "path": "docs",
+    },
+    {
+      "name": "🛠️ Ops",
+      "path": "ops",
+    },
+  ],
+  "settings": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "explicit",
+    },
+    "oxc.enable.oxlint": true,
+    "oxc.enable.oxfmt": true,
+    "[javascript]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+    },
+    "[javascriptreact]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+    },
+    "[json]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+    },
+    "[jsonc]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+    },
+    "[css]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+    },
+    "[scss]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+    },
+    "[html]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+    },
+    "[markdown]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+    },
+    "[yaml]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode",
+    },
+    "vitest.disableWorkspaceWarning": true,
+    "files.exclude": {
+      "**/.git": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true,
+      "**/node_modules": true,
+      "**/.cache": true,
+      "**/.turbo": true,
+      "**/.build": true,
+      "**/.output": true,
+      "**/coverage": true,
+    },
+    "github.copilot.chat.commitMessageGeneration.instructions": [
+      {
+        "file": "__GIT_INSTRUCTIONS_PATH__",
+      },
+    ],
+  },
+  "extensions": {
+    "recommendations": ["oxc.oxc-vscode", "vitest.explorer"],
+  },
+}

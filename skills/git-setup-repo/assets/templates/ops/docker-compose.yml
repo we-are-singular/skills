@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:__POSTGRES_MAJOR__
+    restart: unless-stopped
+    ports:
+      - "__POSTGRES_DEV_PORT__:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: app
+    volumes:
+      # TODO(git-setup-repo): use the data mount required by the selected PostgreSQL image major.
+      - db-data:__POSTGRES_DATA_MOUNT__
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  db-test:
+    image: postgres:__POSTGRES_MAJOR__
+    restart: unless-stopped
+    ports:
+      - "__POSTGRES_TEST_PORT__:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: app_test
+    tmpfs:
+      - __POSTGRES_DATA_MOUNT__
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d app_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:__REDIS_MAJOR__-alpine
+    restart: unless-stopped
+    ports:
+      - "__REDIS_PORT__:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  db-data:

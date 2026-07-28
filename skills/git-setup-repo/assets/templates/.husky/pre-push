@@ -1,0 +1,6 @@
+set -e
+
+__PACKAGE_MANAGER__ run format:check
+__PACKAGE_MANAGER__ run lint
+__PACKAGE_MANAGER__ run test
+__PACKAGE_MANAGER__ run build

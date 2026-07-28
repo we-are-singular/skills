@@ -70,6 +70,16 @@ Use for bringing an existing pull request back to a mergeable or review-ready st
 
 The skill emphasizes full blocker triage before editing, explicit user choices for fix versus pushback versus deferral, reviewer replies or queued reply text before the final push, and avoiding repeated review triggers from incremental pushes.
 
+### Git Setup Repo
+
+```bash
+npx skills add we-are-singular/skills --skill git-setup-repo
+```
+
+Use for bootstrapping a new repository, converting or deduplicating a monorepo, or standardizing an existing one. Covers shared dependency ownership and peer contracts, CI, package-manager caching, Oxc linting and formatting, Vitest tests and coverage, Husky/lint-staged/commitlint hooks, local service provisioning, workspace metadata, README onboarding, and evidence-gated release/deploy setup.
+
+The skill builds a read-only setup brief and resolves material user decisions before editing. It keeps dependency owners, local scripts, hooks, CI, and documentation aligned, and includes generic copy-and-adapt templates without product, provider, tracker, reviewer, environment, or credential details.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

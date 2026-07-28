@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Setup Repo"
+  short_description: "Bootstrap or standardize repos and monorepos"
+  default_prompt: "Use $git-setup-repo to audit and singularify this repository, including its dependency ownership."
