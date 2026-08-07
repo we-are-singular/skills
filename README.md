@@ -80,6 +80,16 @@ Use for bootstrapping a new repository, converting or deduplicating a monorepo, 
 
 The skill builds a read-only setup brief and resolves material user decisions before editing. It keeps dependency owners, local scripts, hooks, CI, and documentation aligned, and includes generic copy-and-adapt templates without product, provider, tracker, reviewer, environment, or credential details.
 
+### Git Work Recap
+
+```bash
+npx skills add we-are-singular/skills --skill git-work-recap
+```
+
+Use for recapping the pull requests a person authored, from a single stand-up day to a sprint or month. Covers account-wide PR discovery, author and timezone resolution, natural-language dates and ranges, a 03:00 workday boundary so late-night work counts toward the right day, an optional tracker lane when a connector is available, and evidence-backed Markdown output with links.
+
+The skill emphasizes authored work only, actor-level attribution over bare update timestamps so another person's merge is not reported as yours, verified timestamps over search summaries, lazy metadata hydration for candidate PRs, tracker items only where they add what PRs do not, theme grouping over day-by-day narration on long ranges, and read-only access.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
