@@ -1,6 +1,6 @@
 ---
 name: backend-architecture
-description: Use when writing, reviewing, or refactoring TypeScript/Node.js backend code, including APIs, middleware, services, repositories, database packages, SDKs, workers, integrations, config DSLs, tests, and backend architecture decisions.
+description: Use when writing, reviewing, or refactoring TypeScript/Node.js backend application or API code where backend design guidance is useful, including APIs, routes, controllers, middleware, SDKs, services, repositories, database access, runtime workers, and external integrations that implement backend behavior. Do not use merely because code runs in Node.js or on a server. Skip CI/workflow configuration, deployment or maintenance scripts, demos, tests, simple renames, formatting, documentation-only work, small localized changes, and other mechanical or supporting work that does not require backend design guidance.
 license: MIT
 ---
 
