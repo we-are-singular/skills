@@ -18,35 +18,39 @@ Before changing code:
 - Search before creating a new helper, service, schema, repository, middleware, or shared type. Consolidate similar code instead of adding another near-duplicate.
 - Identify the canonical source of truth for contracts and generated files before editing schemas or DTOs.
 
-Default posture: boundaries early, implementations lean.
+Default posture: **boundaries early, implementations lean**.
+
+> Decide the app or package layer structure early and follow it consistently; do not let each use case invent its own onion. Keep code inside each chosen boundary as direct as its responsibility allows.
 
 ## Core Principles
 
 - Use TypeScript for backend code. Prefer strict, explicit domain models over loose objects.
-- Keep implementations direct, but create clear ownership boundaries before code becomes tangled.
+- Use progressive disclosure: make top-level use-case orchestration read linearly in domain terms, keep the happy path visible, and push parsing, process, protocol, and storage mechanics into the boundary that owns them.
 - Keep things simple and local until reuse is real.
 - Name things by domain responsibility: `MailboxRepository`, `ProvisioningService`, `createRepository`, `WebhookCryptoService`.
 - Avoid vague names like `Manager`, `Handler`, `Processor`, or `Util` unless the framework or domain role is genuinely vague.
+- Give state and its invariants one owner. Ask that owner to perform domain operations instead of exposing state for callers to coordinate.
 - Use ESM and `node:` imports for Node builtins when the repo supports them.
 - Keep generated files clearly marked and avoid hand-editing them unless the repo explicitly expects it.
-- Avoid unnecessary helper files, barrels, and single-purpose indirection unless they clarify ownership or support a real package boundary.
+- Prefer deep modules that hide meaningful complexity over shallow helpers, barrels, and single-purpose indirection.
 - Avoid "spaghetti DRY": centralization is good only when it simplifies call sites and ownership.
-- Do not invent future state. If a future field or behavior is not implemented yet, leave a clear TODO instead of speculative logic.
+- Do not invent future state or defensive machinery without evidence. Leave a clear TODO for unimplemented behavior; security, data integrity, cleanup, and documented runtime contracts remain required.
 - Keep server-only packages out of browser bundles; add an explicit runtime guard if accidental browser import would be dangerous.
 - Follow repo-local formatting, linting, and import ordering over personal preference.
 
 ## Architecture Boundaries
 
-Map responsibilities before writing code.
+Use functional core / imperative shell as a mental model: keep domain decisions independent of I/O mechanics, and let application workflows coordinate repositories and integrations. Map those responsibilities before writing code.
 
 ### Routes, Controllers, And Middleware
 
 Routes/controllers should own transport concerns:
 
 - HTTP method, path, status code, request/response shape.
-- Authentication and guard wiring.
+- Caller and request state, authentication, and guard wiring.
 - Request parsing and schema validation.
-- Delegating to services or repositories.
+- Request-specific policy that decides whether and how the use case may start.
+- Delegating trusted input to services or repositories.
 - Mapping expected domain outcomes to transport responses.
 
 Prefer config-driven route declarations when the framework supports them. Declaring auth, guards, input/output schemas, and rate limits on route config keeps handlers lean and makes authorization reviewable at a glance. This Fastify-style example is illustrative; keep the same shape in other frameworks instead of copying the exact APIs:
@@ -68,6 +72,16 @@ fastify.post("/mailboxes", {
 ```
 
 When the framework has no config-driven routes, keep the same separation by calling guards and validators at the top of the handler, then delegating to services.
+
+```ts
+async function provisionMailboxController(mailbox: MailboxDraft) {
+  await userGuard(mailbox.user.id, "mailbox.create")
+  const provisioned = await provisionMailbox(mailbox)
+  return MailboxSchema.parse(provisioned)
+}
+```
+
+The second example assumes `MailboxDraft` is already parsed, trusted request input. It expresses the same boundary without a route DSL: the controller owns ACL and public DTO parsing, while `provisionMailbox` receives trusted input and remains unaware of transport state.
 
 Standardize transport responses and error envelopes once per app or framework boundary. Do not invent ad-hoc response formats per route.
 
@@ -123,6 +137,19 @@ Services own application workflows:
 - Enforce business sequencing that crosses persistence and outside-world effects.
 - Decide how to recover from external failures.
 - Emit logs around important lifecycle steps, transitions, and failures.
+
+Services may be single-purpose operations or orchestrators. They receive trusted inputs, return internal or domain outputs, and own durable business rules and workflow sequencing—not caller state, transport policy, or public response formatting.
+
+Keep orchestrators flat and readable by composing intention-revealing operations:
+
+```ts
+async function provisionMailbox(mailbox: MailboxDraft) {
+  const reserved = await mailboxes.reserve(mailbox)
+  const provisioned = await mailServer.provision(reserved)
+  await mailboxes.activate(reserved.id, provisioned)
+  return provisioned
+}
+```
 
 Services may call external systems. Repositories should not.
 
@@ -229,7 +256,7 @@ Schema placement:
 - If a type is tiny and local to one function or file, keep it inline.
 - Create local `types.ts` or helper files only when the source file becomes hard to read.
 
-Prefer parsing at boundaries over trusting plain TypeScript types:
+Parse at the boundary that owns the data: requests and public responses in controllers, persisted rows in repositories, and provider payloads in integrations. Pass the resulting trusted values inward instead of continuing to pass raw values through the system:
 
 ```ts
 const CreateMailboxRequest = z.object({
@@ -254,6 +281,8 @@ class MailboxRepository {
 }
 ```
 
+Use discriminated unions when fields represent mutually exclusive states. Make illegal combinations difficult to construct instead of documenting them as nullable-field conventions.
+
 Use return type inference by default. Add explicit return types when they clarify public contracts, exported factories, public class methods, async boundary behavior, or repo-local lint rules require them.
 
 ### Single Source Of Truth
@@ -262,7 +291,7 @@ Use one canonical contract source for durable shapes. Good patterns:
 
 - Database table definitions generate insert/select schemas and raw DB types.
 - DTO schemas extend or narrow generated table schemas.
-- API responses parse through DTOs before leaving repositories or services.
+- Controllers parse service results through public DTOs before responding.
 - SDK clients normalize generated protocol types into app-owned response types.
 
 Bad patterns:
@@ -286,11 +315,13 @@ When the codebase uses a build step to generate schemas, repository factories, b
 
 ## Classes, Dependency Injection, And Factories
 
-Use classes when the object has dependencies, state, lifecycle, logging context, or a cohesive set of public methods.
+Use classes when the object owns dependencies, state, lifecycle, logging context, or a cohesive set of public methods. A service does not need to be a class merely because it participates in the chosen architecture.
 
-Most backend classes should be singleton-style services, repositories, adapters, facades, or modules built once at composition time. Prefer one constructed app graph per process, test app, worker, or request scope. Avoid model-driven classes where each database row becomes an object with behavior unless the local codebase clearly uses that style. Use inheritance mostly for infrastructural base classes, such as `BaseRepo`, where it removes repeated mechanics.
+Construct backend services, repositories, adapters, facades, and modules once at composition time when they benefit from object ownership. Prefer one app graph per process, test app, worker, or request scope. Avoid model-driven classes where each database row becomes an object with behavior unless the local codebase clearly uses that style. Avoid inheritance by default; use it only for stable infrastructure mechanics that remove real repetition.
 
 Use functions when behavior is pure, stateless, or better represented as a guard/helper/transform.
+
+Keep state transitions behind the class, service, or module that owns the invariant; callers should request the domain operation rather than coordinate internal mutations.
 
 Default to concrete dependencies:
 
@@ -318,19 +349,7 @@ class SessionService {
 
 Avoid named ports/interfaces by default. They add another contract that can drift. Introduce them only for a real boundary with multiple implementations, package independence, or a testability problem that concrete injection cannot solve cleanly.
 
-Use factories for standard wiring, not simple object creation. Repository factories should accept the raw database client and return smart repository instances. The `ReturnType` alias keeps the graph type derived from the factory instead of duplicated by hand:
-
-```ts
-// generated repository factory: index.gen.ts
-export function createRepository(db: DBClient) {
-  return {
-    Mailbox: new MailboxRepository(db),
-    Webhook: new WebhookRepository(db),
-    Host: new HostRepository(db),
-  } as const
-}
-export type DBRepository = ReturnType<typeof createRepository>
-```
+Use factories for standard wiring, not simple object creation. Repository factories may accept the raw database client and return smart repository instances; derive the graph type with `ReturnType` instead of duplicating it by hand.
 
 Factories are useful when:
 
@@ -407,7 +426,7 @@ Steps should not each invent their own try/catch policy. Let the orchestrator ow
 
 ## Helpers And Shared Utilities
 
-Extract helpers early when they name a real concept or repeated operation, but search first.
+Extract a helper when it names a real concept, hides meaningful complexity, or stable repetition has emerged. Prefer one deep operation over a chain of shallow helpers. Search first.
 
 Before adding a helper:
 
@@ -416,8 +435,7 @@ Before adding a helper:
 - Give it a specific name. Avoid `utils.ts` growing into unrelated functions.
 - Add focused tests when parsing, normalization, security, crypto, dates, IDs, or edge cases are involved.
 
-Do not create one file for every tiny function. Keep tiny single-use logic inline until extraction makes the caller clearer or prevents duplication.
-Do not add helper functions just to DRY one line. Centralize only when the helper names a real concept, clarifies ownership, or removes meaningful duplication.
+Do not create one file for every tiny function or extract a helper just to DRY one line. Keep tiny single-use logic inline until extraction makes the caller clearer or prevents meaningful duplication.
 
 ## Environment And Config
 
@@ -497,6 +515,8 @@ user.name = input.name
 
 ## Error Handling
 
+Use guard clauses to reject invalid conditions before the happy path. Add local `try`/`catch` only when the current layer owns a recovery policy; otherwise let the error reach the existing boundary.
+
 Expected domain outcomes should be explicit:
 
 - Return `null` when absence is normal.
@@ -539,7 +559,7 @@ Use test-assisted development by default:
 - Go test-first for bugs, regressions, risky branching, contracts, security, crypto, auth/guards, and persistence transitions.
 - For exploratory work where the implementation shape is still moving, avoid freezing tests around churn. Once the shape settles, add or update behavior tests for the final branches, contracts, and failure modes.
 - Do not test what TypeScript already guarantees.
-- Keep tests focused on behavior and contracts, not implementation trivia.
+- Test observable behavior through the stable boundary that owns it. Do not test one-line helpers or incidental implementation order.
 
 Default backend test layout:
 
@@ -557,7 +577,8 @@ Adapt to the repo if it already uses co-located tests or another clear conventio
 Test choices:
 
 - Unit-test pure helpers, guards, crypto, validation, and service logic with fake dependencies.
-- Integration-test routes with the framework's injection/test client.
+- Integration-test routes with the framework's injection/test client, including ACL, delegation, DTO parsing, and error mapping.
+- Test service orchestrators through trusted inputs and observable outputs; assert operation order only when sequencing is part of the contract.
 - Repository-test persistence behavior with seed data and real DTO parsing.
 - Use snapshots only for stable response, DTO, and error contracts.
 - Normalize generated IDs, timestamps, random values, and external values with explicit matchers.
@@ -575,45 +596,27 @@ Test mock patterns:
 
 Do:
 
-- Read the local code before choosing an architecture.
-- Keep routes thin and services/repositories meaningful.
-- Centralize durable contracts early.
-- Keep endpoint-specific request schemas near the endpoint.
-- Give repositories real persistence behavior.
-- Use concrete dependency injection by default.
-- Wrap external systems behind app-owned services/adapters.
-- Search and consolidate before creating helpers.
-- Use config DSLs/registries when a domain has many typed variants.
-- Generate secondary contract formats from one canonical source.
-- Add focused tests for changed backend behavior.
-- Declare auth and guards at the route boundary, not scattered through workflows.
-- Use discriminated result types for external operations with expected failures.
-- Register plugins in dependency order with explicit declarations.
-- Mark generated files with `.gen.ts` suffix and never hand-edit them.
+- Choose the app's boundaries early and follow them consistently across use cases.
+- Keep controllers flat: resolve request state and guards, delegate trusted input, then parse the public DTO.
+- Keep services focused on their inputs, outputs, durable business rules, and named domain operations.
+- Use classes, dependency injection, and factories when they clarify ownership, lifecycle, or construction.
+- Push ugly mechanics downward behind deep, intention-revealing interfaces.
 
 Don't:
 
-- Create repositories that only mirror one ORM method.
-- Put external API calls in repositories.
-- Put long workflows in middleware.
-- Create abstract interfaces for every dependency.
-- Add a shared helper without checking existing helpers.
-- Scatter app-wide contracts across feature folders.
-- Maintain the same contract by hand in multiple schema formats.
-- Let generated clients or protocol types leak through the whole app.
-- Start schedulers/listeners in module scope without idempotency or cleanup.
-- Snapshot volatile behavior without normalizing it.
-- Comment obvious mechanics.
-- Scatter authorization checks inside handler bodies when boundary-level guards are available.
-- Throw for expected external-system failures when a result type is clearer.
-- Hand-edit generated files instead of updating the generator.
+- Treat classes, inheritance, dependency injection, or factories as the architecture itself.
+- Create controller, service, repository, or helper chains that only forward calls.
+- Pass transport authentication or request state into reusable services, or return public DTOs from them.
+- Bury the normal flow under nested branches or local `try`/`catch` blocks without a recovery responsibility.
+- Let individual use cases bypass or reinvent the app's chosen onion.
 
 ## Review Checklist
 
 When reviewing backend code, check:
 
-- Are transport, workflow, persistence, and external-system responsibilities separated?
-- Are auth, guards, validation, and request context wired at the boundary, not buried in handlers?
+- Are transport, workflow, persistence, and external-system responsibilities separated, with the normal path visible at the controller and service boundaries?
+- Do controllers own caller state, ACL, request/response parsing, and transport mapping?
+- Do services receive trusted inputs and own reusable operations, durable business rules, and workflow sequencing?
 - Are guards composable, wired at the route boundary, and fail-closed?
 - Are durable contracts centralized and endpoint-local schemas kept local?
 - Is there one contract source of truth, or are shapes duplicated by hand?
