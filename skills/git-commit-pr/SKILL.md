@@ -349,12 +349,16 @@ When all commits are ready, show the user:
 - Validation run and result.
 - Draft PR title and body.
 
-Ask for confirmation before pushing:
+Ask for confirmation before pushing. If the runtime provides a structured user-question tool, use it here instead of printing a plain-text choice list. Examples include Codex `request_user_input`, Claude Code `AskUserQuestion`, Cursor `cursor/ask_question`, and OpenCode `question`.
+
+Offer these choices, with push first and marked as the recommended/default option so the user can usually approve by pressing Enter:
 
 ```text
-1. push it!
-2. request changes to the commit plan or PR body
+1. Push it!
+2. Request changes to the commit plan or PR body
 ```
+
+If no structured question tool is available, ask with the same choices in plain text.
 
 Do not push or create the PR until the user clearly confirms.
 

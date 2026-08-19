@@ -109,11 +109,13 @@ CI-1: <failed check name>
 PROBLEM: <brief summary of the failure, location, and evidence>
 ```
 
-If not in Plan mode, stop after this snapshot and recommend moving the next phase to Plan mode for one-decision-at-a-time planning. If already in Plan mode, proceed directly into the item-by-item questions.
+After this snapshot, wait for user input unless the user explicitly authorized fixing the PR's blockers when invoking the skill. If that authorization clearly covers an item, treat its action as approved; still ask about any item where the intended fix or tradeoff is ambiguous.
+
+If in Plan mode, begin the item-by-item interview immediately. If not in Plan mode but the runtime provides a structured user-question tool, use it to conduct the same interview without requiring a mode change. Examples include Codex `request_user_input`, Claude Code `AskUserQuestion`, Cursor `cursor/ask_question`, and OpenCode `question`. If neither Plan mode nor a structured question tool is available, stop after the snapshot and wait for the user to respond.
 
 ## Agree On A Plan
 
-Do not implement fixes until the user chooses an action for each blocking item.
+Do not implement fixes until the user chooses an action for each blocking item, except where the permission given when invoking the skill already authorizes a clear action.
 
 Ask one question per blocker or per independent actionable fix. Never ask one broad question such as "how should we fix all 5 items?" If two comments share the same root cause and will be fixed by the same code change, group them as one actionable fix, but list every triggering comment under that item.
 
