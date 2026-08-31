@@ -6,9 +6,9 @@ Use a findings-first report. Keep it concise enough for a PR author to act on, b
 
 - `critical` - must fix: exploitable vulnerability, data loss/corruption, complete outage, irreversible migration breakage, or a change that cannot safely land.
 - `high` - should fix: likely user-facing bug, broken contract, authz/authn gap, serious regression, unsafe rollout, or major architecture mismatch.
-- `low` - worth addressing: meaningful edge case, missing coverage for changed behavior, maintainability trap, performance risk, or pattern mismatch with real downside.
-- `question` - needs human clarification: missing intent, unclear product decision, conflicting docs, unverifiable assumption, or a review blocker that is not yet a proven bug.
-- `hint` - optional suggestion or hunch: naming, readability, small refactor path, or suspicious shape that is not important enough to block or strongly steer the PR.
+- `low` - should fix: concrete reachable defect, contract problem, missing behavioral proof, performance risk, or material structural debt with meaningful present impact. A human may accept it with a reason, but the reviewer does not consider it optional.
+- `question` - needs a human decision: specific unresolved intent or behavior whose answer is required before merge readiness can be decided.
+- `nit` - optional cleanup: concrete touched-code improvement in naming, placement, commentary, readability, redundant types, or unused surface that is safe to leave unchanged.
 
 ## Report Shape
 
@@ -20,10 +20,10 @@ Use a findings-first report. Keep it concise enough for a PR author to act on, b
    Impact: <observable consequence>
    Fix: <concrete code change, refactor path, or decision needed>
 
-2. [question] Missing intent for non-obvious behavior - `path/to/file.ts:10`
-   Evidence: <PR body/plan/conversation absent or contradicts diff>
-   Impact: <why reviewability or contract safety is harmed>
-   Ask: <specific answer needed, or document intent / split scope / add acceptance criteria>
+2. [question] Active contracts disagree on compatibility - `path/to/file.ts:10`
+   Evidence: <PR body/plan/conversation conflicts with tests or another active contract>
+   Impact: <why the answer changes merge readiness>
+   Ask: <specific contract decision needed>
 
 ## Intent Fit
 
@@ -67,10 +67,10 @@ No review findings. Residual risks are listed above.
 ## Finding Rules
 
 - Findings lead. Do not start with praise or a broad summary.
-- Order by flag, then file path. Flag order is `critical`, `high`, `low`, `question`, `hint`.
+- Order by flag, then file path. Flag order is `critical`, `high`, `low`, `question`, `nit`.
 - Each finding needs a file and line. If the issue is missing docs/intent, cite the most relevant changed file or PR body/plan location.
 - Use absolute certainty sparingly. Say what was verified and what remains uncertain.
-- Questions are findings when they block review, expose missing intent, or need a product/architecture decision. Use the `question` flag and ask one specific thing.
+- Questions are findings only when a known contract fork blocks merge readiness. Name the exact decision, conflicting or missing evidence, and why the answer changes the review.
 - Separate residual risks from actionable findings.
 - Separate pre-existing issues unless the diff makes them newly reachable.
 
@@ -79,5 +79,5 @@ No review findings. Residual risks are listed above.
 - Use `TLDR`. The reviewer recommends; humans decide.
 - Keep it to one short paragraph or 2-4 bullets.
 - Name the next move: fix specific items, split the PR, add intent/tests, rethink the structure, or proceed with residual risks.
-- If findings are mostly questions or hints, say whether the next step is clarification or optional cleanup.
+- If findings are mostly questions or nits, say whether the next step is clarification or optional cleanup.
 - If there are no findings, say no findings and mention any residual risk or missing validation.
