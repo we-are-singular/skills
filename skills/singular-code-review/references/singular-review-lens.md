@@ -70,7 +70,7 @@ Common frontend findings:
 
 ## Maintainability And Elegance
 
-Look for "code judo": a restructuring that preserves behavior while deleting concepts, branches, flags, or helper layers.
+Look for "code judo": a restructuring that preserves behavior while deleting concepts, branches, flags, or helper layers. Own local simplicity, concept count, clear ownership, and scan cost; repository-wide architectural policy belongs to the standards lane.
 
 Flag when the PR:
 
@@ -78,7 +78,7 @@ Flag when the PR:
 - Spreads feature checks across shared code.
 - Introduces thin wrappers that do not simplify anything.
 - Adds casts, `any`, excessive optionality, or silent fallbacks instead of clarifying the boundary.
-- Crosses a large-file threshold without a strong reason, especially moving a file over 1000 lines.
+- Creates or materially grows an ordinary source file past 500 lines while mixing several helpers, functions, types, schemas, or responsibilities with few structural cues; exclude generated, vendored, external, build, migration, and maintenance scripts, and treat line count only as an investigation signal.
 - Centralizes code in a way that increases coupling or hides ownership.
 - Duplicates an existing canonical helper, hook, service, policy, schema, or adapter.
 - Moves complexity around without reducing the number of concepts a reader must hold.
