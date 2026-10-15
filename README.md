@@ -70,6 +70,16 @@ Use for bringing an existing pull request back to a mergeable or review-ready st
 
 The skill emphasizes full blocker triage before editing, explicit user choices for fix versus pushback versus deferral, reviewer replies or queued reply text before the final push, and avoiding repeated review triggers from incremental pushes.
 
+### Git Finish
+
+```bash
+npx skills add we-are-singular/skills --skill git-finish
+```
+
+Use when work needs to reach ready to merge: finish the agreed task, review and fix it locally, commit and publish it, then follow CI and reviewer feedback until all blockers are resolved. Composes `singular-code-review`, `git-commit-pr`, and `git-fix-pr`; dependent PRs also use `gh-stack`.
+
+An explicit invocation authorizes the scoped commit, push, and review-fix loop without repeated confirmations. Supports delegated workers and coordinators managing stacks, publishing all layers as drafts and advancing review one layer at a time. Merging requires explicit permission.
+
 ### Git Setup Repo
 
 ```bash
