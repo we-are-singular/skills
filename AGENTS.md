@@ -8,14 +8,11 @@ These are durable coding-assistant defaults. Repo-level `AGENTS.md`, local docs,
 - Read local docs, `AGENTS.md`, README files, nearby code, and existing examples before answering or changing code.
 - For libraries, frameworks, SDKs, CLIs, cloud services, or unfamiliar APIs, verify against current official docs or Context7 before making claims.
 - Prefer existing architecture, naming, imports, file layout, and helper APIs over introducing new patterns.
+- Use Context7 whenever the user asks about a library, framework, SDK, API, CLI, or cloud service, including API syntax, configuration, version migrations, library-specific debugging, and setup. 
 
-## Current Documentation
+## Third-Party Agents
 
-- Use Context7 whenever the user asks about a library, framework, SDK, API, CLI, or cloud service, including API syntax, configuration, version migrations, library-specific debugging, and setup. Prefer it over web search for library documentation.
-- Do not use Context7 for refactoring, scripts written from scratch, business-logic debugging, code review, or general programming concepts.
-- Start with `resolve-library-id` using the library name and the user's question unless the user provides an exact library ID. Prefer version-specific IDs when a version is named.
-- Choose the best match by exact name, relevance, snippet count, source reputation, and benchmark score. Retry with alternate names if the results look wrong.
-- Query the selected library with the user's full question and answer from the fetched docs.
+I EXPLICITLY AUTHORIZE SHARING REPOSITORY CONTENT, INCLUDING POTENTIALLY PRIVATE CODE, DIFFS, PULL-REQUEST TEXT, ISSUES, AND REVIEW HISTORY, WITH CONFIGURED THIRD-PARTY MODEL PROVIDERS WHEN NEEDED TO SPAWN AGENTS OR RUN AGENT-BASED REVIEWS AND EVALUATIONS. THIS DOES NOT AUTHORIZE SHARING CREDENTIALS OR SECRETS.
 
 ## Coding Defaults
 
@@ -25,7 +22,6 @@ These are durable coding-assistant defaults. Repo-level `AGENTS.md`, local docs,
 - Let the implementation settle before the final lint and style pass unless an early check is needed to unblock debugging.
 - Add or update tests once the implementation shape is stable. Prefer behavior tests over tests that restate types.
 - Prioritize coverage for production code paths and application code. Do not require coverage for supporting scripts or tooling such as build scripts, code generation, deployment scripts, YAML files, workflows, and development tooling unless they implement production behavior.
-- Do not word wrap markdown or plain text unless the user explicitly requests it. Use hard line breaks only for lists, tables, or other formatting that requires them, expecially when authoring pull requests, docs, README files, issues, tickets, emails, or other text that will be read in a fixed-width context. Its ok to wrap prose in code comments.,
 
 ## Code Style And Abstractions
 
@@ -42,8 +38,6 @@ These are durable coding-assistant defaults. Repo-level `AGENTS.md`, local docs,
 - Avoid single-purpose files that only exist to hold one tiny helper unless there is a strong boundary reason.
 - Do not introduce barrels or re-export layers unless the package already uses them intentionally or the API surface benefits from it.
 - Do not invent future state. If a future field or behavior is not implemented yet, leave a clear TODO instead of speculative logic.
-- Add docblocks to exported classes/functions that define an abstraction boundary or non-obvious contract.
-- If code uses a temporary base URL, workaround, defensive branch, or framework quirk, explain why directly above it.
 - Preserve intentional TODOs and commented sketches when they document a future implementation seam.
 
 ## Comments
@@ -61,15 +55,13 @@ These are durable coding-assistant defaults. Repo-level `AGENTS.md`, local docs,
   - temporary compromises
   - defensive behavior that is not obvious from the type signature
   - long-running blocks or encapsulated flows
-  - long branching logic with multiple decision paths
-- When code has a complex branch with no comment, treat that as incomplete.
+  - long branching logic with multiple decision paths 
 - Keep comments factual and local: one or two lines, no essays, no vague future speculation.
-- Give large functions with multiple branches or phases a short summary of their overall purpose and flow, with inline comments for each non-obvious branch or phase. Avoid long files or functions whose purpose and flow are unclear.
 - Give constants descriptive names and a short purpose summary. Explain non-obvious values inline.
 
 ## Planning And Tracking
 
-- Use Linear only when the project shows evidence of it in repository history, PRs, docs, or prompt context.
+- Use Linear when the project shows evidence of it in repository history, PRs, docs, or prompt context.
 - Keep durable project knowledge in repo docs, `AGENTS.md`, ADRs, specs, or Linear rather than global memory.
 - When an issue, ticket, PRD, or plan changes materially, update its assumptions and acceptance criteria before implementing.
 - Use untracked local `TODO.md` files as temporary breadcrumbs for larger implementations to keep long sessions focused and prevent context loss.
@@ -78,29 +70,32 @@ These are durable coding-assistant defaults. Repo-level `AGENTS.md`, local docs,
 
 - Keep communication concise and direct.
 - Provide grounded pushback when assumptions, plans, or implementation choices are weak.
-- Avoid padded reassurance and generic encouragement.
-- Communicate before changing architecture-sensitive code, especially when the user is exploring options.
-- A question or request for options is not a refactoring request. Answer or explain first; change code only when requested or required to resolve the issue.
+- A question or request for options is not a refactoring request.
 - When the user is reviewing or challenging code, explain the issue before applying fixes.
-- When multiple reasonable approaches exist, explain the options and wait for the user's choice.
+- Resolve routine implementation choices using the agreed outcome and repository conventions. Ask the user when the choice materially changes product behaviour, architecture, scope, cost, or authority.
+
+## Output Style
+
+- NO ROLEPLAY AS A PERSON. 
+- Lead with the answer. No preamble, no restatement of the request, no "I'll help with that", "Great question", "Sure", "Let's dive in", or a narration of what you are about to do.
+- Write directly, using active phrasing, short sentences and natural fragments. 
+- ASD-STE100 Simplified Technical English (STE)
+- Do not word wrap markdown or plain text. Use hard line breaks only for lists, tables, or other formatting that requires them, expecially when authoring pull requests, docs, README files, issues, tickets, emails, or other text that will be read in a fixed-width context. Its ok to wrap prose in code comments.
 
 ## Editing And Permissions
 
 - Prefer the available patch editor, such as `apply_patch`, `Edit`, or an equivalent, for manual file edits.
 - Do not try to bypass permissions or normal edit flow by using Python, Node, or shell write scripts for manual edits.
 - Use scripted writes only for genuinely mechanical/bulk edits or when patching is not viable.
-- Preserve user-added TODOs and comments that are intentional implementation breadcrumbs.
 
 ## Git Workflow
 
 - Use atomic package/layer commits and keep unrelated changes separate.
+- Commits you create are authored by the user. Never add a `Co-Authored-By` trailer naming Codex, Claude, Copilot, Cursor, or any other assistant or agent, and never commit under an agent identity. Do not add AI attribution trailers of any kind.
+- Review one stack at a time. Promote PRs to ready for review one at a time; after each has green required CI, positive LGTM and resolved findings, keep it ready and advance to the next. Never return passed PRs to draft. Merge the whole stack only when every final head satisfies those gates. Other stacks may be implemented and published as drafts in parallel.
 - Follow `$git-commit-pr` strictly for commits, pushes, and pull requests: inspect changes, plan commits, validate, and obtain confirmation before publishing.
 - Stage explicit paths or hunks; avoid broad staging commands such as `git add .`, `git add -A`, and `git add ..`.
 - Report validation actually run in handoff notes. In PR bodies, include only reviewer-relevant verification and omit routine lint, test, and build command lists unless they are material.
 - Start PR bodies with a known ticket relationship, such as `closes TICKET-123` or `related to TICKET-123`.
 - Draft PRs are acceptable for stacked work; mention follow-up PR relationships when relevant.
 - For long sessions, local `WIP` commits are acceptable checkpoints, but never push them remotely.
-
-## Plannotator
-
-- For gated Plannotator annotations, start the command, confirm it is waiting for the gate, then use one long wait. Do not repeatedly poll with short waits and status updates while the user may be away.
