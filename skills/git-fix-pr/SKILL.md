@@ -1,6 +1,6 @@
 ---
 name: git-fix-pr
-description: Use when an active PR needs a deliberate fix pass to identify the right PR, triage CI, review, and body blockers, agree on actions with the user, make and commit the fixes, update reviewer threads or PR text, then push once.
+description: Fix an open pull request in one pass. Finds the right PR, triages failing CI, review comments and TODOs in the PR body, agrees on each action with the user, commits the fixes, replies to reviewers or updates the PR text, then pushes once. Use when the person says "fix the PR", "fix CI", "address the review", "resolve the comments", "the PR is failing", "reply to the reviewers", or names a PR that has blockers. For local changes that have no PR yet, use git-commit-pr.
 ---
 
 # Git Fix PR
