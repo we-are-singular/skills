@@ -1,0 +1,9 @@
+{
+  "name": "proof",
+  "version": "0.2.0",
+  "description": "Agents back finished work with before and after evidence, gathered into one PROOF.md.",
+  "author": {
+    "name": "Singular",
+    "url": "https://wearesingular.com"
+  }
+}
