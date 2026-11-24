@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/proof/scripts/proof\" hook stop",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
