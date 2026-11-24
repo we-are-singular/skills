@@ -1,6 +1,6 @@
 ---
 name: git-commit-pr
-description: Use when preparing local changes for commit, push, and pull request creation, especially in repositories that use conventional commits, package/workspace scopes. This skill optimizes for clean history, package-scoped commits, repository-specific rules, and a PR body that explains intent.
+description: Turn local changes into clean commits and a draft pull request. Reads the repo's commit and PR rules, stages exact paths, splits commits by package or workspace scope with conventional messages, runs validation, confirms with the user, then pushes and opens a PR whose body explains intent. Use when the person says "commit this", "commit and push", "open a PR", "create a pull request", or "put this up for review". For a PR that already exists and needs fixes, use git-fix-pr.
 ---
 
 # Git Commit PR
