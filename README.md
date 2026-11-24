@@ -100,6 +100,22 @@ Use for recapping the pull requests a person authored, from a single stand-up da
 
 The skill emphasizes authored work only, actor-level attribution over bare update timestamps so another person's merge is not reported as yours, verified timestamps over search summaries, lazy metadata hydration for candidate PRs, tracker items only where they add what PRs do not, theme grouping over day-by-day narration on long ranges, and read-only access.
 
+## Plugins
+
+Add the marketplace once in Claude Code:
+
+```
+/plugin marketplace add we-are-singular/skills
+```
+
+### Proof
+
+```
+/plugin install proof@singular
+```
+
+Has an agent back finished work with before and after evidence, gathered into one `PROOF.md`. The plugin adds a Stop hook that keeps the agent from ending its turn while a proof is open and not built. To install only the skill, without the hook, run `npx skills add we-are-singular/skills --skill proof`. See [plugins/proof](plugins/proof/README.md).
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

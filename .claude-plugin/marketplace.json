@@ -1,0 +1,17 @@
+{
+  "name": "singular",
+  "owner": {
+    "name": "Singular",
+    "url": "https://wearesingular.com"
+  },
+  "metadata": {
+    "description": "Opinionated agent skills and plugins from Singular."
+  },
+  "plugins": [
+    {
+      "name": "proof",
+      "source": "./plugins/proof",
+      "description": "Agents back finished work with before and after evidence, gathered into one PROOF.md."
+    }
+  ]
+}
